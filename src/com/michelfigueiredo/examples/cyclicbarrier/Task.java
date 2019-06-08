@@ -3,11 +3,11 @@ package com.michelfigueiredo.examples.cyclicbarrier;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-public class Task implements Runnable {
+class Task implements Runnable {
 
     private final CyclicBarrier cyclicBarrier;
 
-    public Task(CyclicBarrier cyclicBarrier) {
+    Task(CyclicBarrier cyclicBarrier) {
         this.cyclicBarrier = cyclicBarrier;
     }
 

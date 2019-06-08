@@ -13,19 +13,41 @@ public class WaitingForPoolOfThreadsToCompleteApp {
 
     public static void main(String[] args) throws InterruptedException {
         List<String> outputs = Collections.synchronizedList(new ArrayList<>());
-        CountDownLatch countDownLatch = new CountDownLatch(20);
+        CountDownLatch countDownLatch = new CountDownLatch(10);
 
         Stream.generate(
             () -> new Thread(new Player(countDownLatch, outputs)))
-            .limit(20)
-            .forEach(thread -> thread.start());
+            .limit(10)
+            .forEach(Thread::start);
 
-        outputs.add("messing up with the threads control");
+        countDownLatch.await(); //wait till all threads are completed
 
-        countDownLatch.await();
+        outputs.add("finished");
 
-        outputs.add("this one didn't mess up anything");
+        outputs.forEach(System.out::println);
+    }
 
-        outputs.forEach(s -> System.out.println(s));
+    private static class Player implements Runnable {
+        private final CountDownLatch countDownLatch;
+        private final List<String> output;
+
+        public Player(CountDownLatch countDownLatch, List<String> output) {
+            this.countDownLatch = countDownLatch;
+            this.output = output;
+        }
+
+        @Override
+        public void run() {
+            System.out.println(Thread.currentThread().getName() + " playing");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            output.add(Thread.currentThread().getName() + " counted down");
+            countDownLatch.countDown();
+
+        }
     }
 }
+
